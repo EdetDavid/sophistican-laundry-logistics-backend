@@ -1,0 +1,75 @@
+# === Python & Virtual Environments ===
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+.venv/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+pip-log.txt
+pip-delete-this-directory.txt
+
+# === Django ===
+*.log
+local_settings.py
+local_settings.py.example
+db.sqlite3
+db.sqlite3-journal
+/media/
+/staticfiles/
+.django_db_cache/
+
+# === Secrets & Environment Variables ===
+.env
+.env.local
+.env.*.local
+.env.production
+.env.staging
+config/local_settings.py
+
+# === AWS & Cloud Credentials ===
+aws_credentials.json
+.aws/
+*.pem
+*.key
+
+# === IDE & Editor ===
+.vscode/
+.idea/
+*.code-workspace
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# === OS & System Files ===
+.DS_Store
+Thumbs.db
+*.bak
+.tmp
+
+# === Node & Frontend (Mobile) ===
+node_modules/
+npm-debug.log
+yarn-error.log
+/mobile/node_modules/
+/mobile/.expo/
+/mobile/dist/
+.expo-shared/

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #06b6d4; color: white; padding: 20px; text-align: center; }
+        .content { padding: 20px; background: #f8f9fa; }
+        .button { display: inline-block; padding: 12px 24px; background: #06b6d4; color: white; text-decoration: none; border-radius: 4px; margin: 20px 0; }
+        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Welcome to Sophistican Laundry Logistics!</h2>
+        </div>
+        <div class="content">
+            <p>Hello {{ name }},</p>
+            <p>Thank you for registering with <strong>Sophistican Laundry Logistics</strong>. Your account has been successfully created!</p>
+            <p>You can now log in and start creating laundry requests. We're here to make your laundry experience effortless and convenient.</p>
+            <h3>What's Next?</h3>
+            <ul>
+                <li>Log in to your account</li>
+                <li>Create your first laundry request</li>
+                <li>Schedule a pickup that works for you</li>
+            </ul>
+            <p><strong>Account Details:</strong></p>
+            <ul>
+                <li><strong>Email:</strong> {{ email }}</li>
+                <li><strong>Account Created:</strong> {{ date_joined|date:"F j, Y" }}</li>
+            </ul>
+            <p>If you have any questions or need assistance, please don't hesitate to contact our support team.</p>
+        </div>
+        <div class="footer">
+            <p>&copy; 2025 Sophistican Laundry Logistics. All rights reserved.</p>
+            <p>This is an automated message. Please do not reply to this email.</p>
+        </div>
+    </div>
+</body>
+</html>

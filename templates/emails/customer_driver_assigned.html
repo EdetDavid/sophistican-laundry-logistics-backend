@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #06b6d4; color: white; padding: 20px; text-align: center; }
+        .content { padding: 20px; background: #f8f9fa; }
+        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Driver Assigned</h2>
+        </div>
+        <div class="content">
+            <p>Dear {{ customer_name }},</p>
+            <p>A driver has been assigned to your laundry request:</p>
+            <ul>
+                <li><strong>Driver:</strong> {{ driver_name }}</li>
+                <li><strong>Items:</strong> {{ items }}</li>
+                <li><strong>Pickup Address:</strong> {{ address }}</li>
+            </ul>
+            <p>The driver will contact you shortly. You can track the status of your request in the app.</p>
+        </div>
+        <div class="footer">
+            <p>This is an automated message from Sophistican Laundry Logistics</p>
+        </div>
+    </div>
+</body>
+</html>
