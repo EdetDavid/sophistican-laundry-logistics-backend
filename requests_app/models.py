@@ -30,6 +30,19 @@ class LaundryRequest(models.Model):
         ("completed", "Completed"),
         ("cancelled", "Cancelled"),
     ]
+    
+    SERVICE_TYPE_CHOICES = [
+        ("shirt_ironing", "Shirt Ironing"),
+        ("trousers_ironing", "Trousers Ironing"),
+        ("full_ironing", "Full Ironing Service"),
+        ("suits", "Suit Cleaning & Pressing"),
+        ("full_home_service", "Full Home Service"),
+        ("wash_dry", "Wash & Dry"),
+        ("hand_wash", "Hand Wash"),
+        ("dry_clean", "Dry Clean"),
+        ("special_care", "Special Care (Delicates)"),
+        ("other", "Other"),
+    ]
 
     customer = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="requests"
@@ -39,6 +52,7 @@ class LaundryRequest(models.Model):
     address = models.TextField()
     pickup_time = models.DateTimeField(null=True, blank=True)
     items_description = models.TextField(blank=True)
+    service_type = models.CharField(max_length=30, choices=SERVICE_TYPE_CHOICES, default="full_home_service")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
     driver = models.ForeignKey(Driver, null=True, blank=True, on_delete=models.SET_NULL)
     created_at = models.DateTimeField(auto_now_add=True)

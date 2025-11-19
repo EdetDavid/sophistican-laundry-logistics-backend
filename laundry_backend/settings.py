@@ -21,7 +21,7 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     "requests_app",
     "corsheaders",
-    "users",
+    "users.apps.UsersConfig",
     "django_ses",  # AWS SES backend
 ]
 
@@ -30,6 +30,7 @@ AUTH_USER_MODEL = "users.User"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -79,6 +80,8 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+# WhiteNoise serves static files with compression and caching headers
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Media files (user uploaded files)
 MEDIA_URL = '/media/'
