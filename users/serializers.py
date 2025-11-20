@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django.conf import settings
+from .models import Notification
 
 User = get_user_model()
 
@@ -101,3 +102,27 @@ class UserSerializer(serializers.ModelSerializer):
             else:
                 data['profile_picture'] = f"{settings.MEDIA_URL}{default_path}"
         return data
+
+
+class NotificationSerializer(serializers.ModelSerializer):
+    summary = serializers.SerializerMethodField()
+    class Meta:
+        model = Notification
+        fields = ('id', 'title', 'body', 'read', 'created_at', 'email', 'related_request', 'summary')
+        read_only_fields = ('id', 'created_at')
+
+    def get_summary(self, obj):
+        # Prefer a concise summary derived from a related request when present
+        try:
+            if obj.related_request:
+                rq = obj.related_request
+                return f"Request #{rq.id} — {rq.customer_name} — {rq.status}"
+        except Exception:
+            pass
+        # Fallback: return a short plain-text excerpt of the body
+        if obj.body:
+            import re
+            # strip HTML tags if present
+            text = re.sub('<[^<]+?>', '', obj.body)
+            return (text.strip()[:180] + '...') if len(text.strip()) > 180 else text.strip()
+        return obj.title or ''

@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import LaundryRequest, Driver
+from .models import PricingItem
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -33,3 +34,12 @@ class LaundryRequestSerializer(serializers.ModelSerializer):
             'items_description', 'service_type', 'status', 'driver', 'driver_id', 'created_at', 'updated_at',
         ]
         read_only_fields = ['customer_email']
+
+
+class PricingItemSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='slug')
+
+    class Meta:
+        model = PricingItem
+        # include both `id` (for client compatibility) and `slug`
+        fields = ['id', 'slug', 'label', 'price', 'description', 'icon', 'ordering']

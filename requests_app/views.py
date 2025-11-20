@@ -7,10 +7,12 @@ from rest_framework.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 from .models import LaundryRequest, Driver
 from .serializers import LaundryRequestSerializer, DriverSerializer
+from .models import PricingItem
+from .serializers import PricingItemSerializer
 from utils.email_service import (
     notify_new_request,
     notify_request_status_update,
-    notify_driver_assignment
+    notify_driver_assignment,
 )
 
 
@@ -30,7 +32,7 @@ class LaundryRequestViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         # Automatically set the customer to the current user
         request = serializer.save(customer=self.request.user)
-        # Send email notifications
+        # Send email notifications and persist in-app notifications
         notify_new_request(request)
 
     @action(detail=True, methods=['post'])
@@ -46,7 +48,7 @@ class LaundryRequestViewSet(viewsets.ModelViewSet):
         request_obj.driver = driver
         request_obj.status = 'assigned'
         request_obj.save()
-        # Send email notifications
+        # Send email notifications and persist in-app notifications
         notify_driver_assignment(request_obj)
         return Response(self.get_serializer(request_obj).data)
         
@@ -80,7 +82,7 @@ class LaundryRequestViewSet(viewsets.ModelViewSet):
         laundry_request.status = new_status
         laundry_request.save()
         
-        # Send status update notification
+        # Send email notifications and persist in-app notifications
         notify_request_status_update(laundry_request, old_status)
         
         return Response(self.get_serializer(laundry_request).data)
@@ -135,3 +137,50 @@ class DriverViewSet(viewsets.ModelViewSet):
         if not request.user.is_staff and Driver.objects.filter(user=request.user).exists():
             return Response({'detail': 'A driver profile already exists for this user.'}, status=400)
         return super().create(request, *args, **kwargs)
+
+
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAdminUser, AllowAny
+
+
+class PricingAPIView(APIView):
+    """Simple endpoint to GET pricing (public) and PUT pricing (admin only).
+
+    GET returns an array of pricing items.
+    PUT expects an array of items and replaces/updates the server-side pricing.
+    """
+    authentication_classes = [TokenAuthentication]
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [AllowAny()]
+        return [IsAdminUser()]
+
+    def get(self, request):
+        items = PricingItem.objects.all().order_by('ordering', 'slug')
+        serializer = PricingItemSerializer(items, many=True)
+        return Response(serializer.data)
+
+    def put(self, request):
+        # Admin-only: replace pricing items with provided list
+        data = request.data
+        if not isinstance(data, list):
+            return Response({'detail': 'Expected a JSON array'}, status=400)
+
+        # For simplicity, remove existing items and recreate from payload
+        PricingItem.objects.all().delete()
+        created = []
+        for idx, item in enumerate(data):
+            serializer = PricingItemSerializer(data={
+                'slug': item.get('id') or item.get('slug') or item.get('slug'),
+                'label': item.get('label') or item.get('name') or '',
+                'price': item.get('price'),
+                'description': item.get('description') or '',
+                'icon': item.get('icon') or '',
+                'ordering': item.get('ordering', idx),
+            })
+            serializer.is_valid(raise_exception=True)
+            created.append(serializer.save())
+
+        out = PricingItemSerializer(created, many=True)
+        return Response(out.data)

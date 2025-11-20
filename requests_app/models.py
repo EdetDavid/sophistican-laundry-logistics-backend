@@ -60,3 +60,19 @@ class LaundryRequest(models.Model):
 
     def __str__(self):
         return f"{self.customer_name} - {self.status}"
+
+
+class PricingItem(models.Model):
+    """Stores pricing for a single service type. The `slug` corresponds to client-side ids."""
+    slug = models.CharField(max_length=100, unique=True)
+    label = models.CharField(max_length=200)
+    price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    description = models.TextField(blank=True)
+    icon = models.CharField(max_length=10, blank=True)
+    ordering = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['ordering', 'slug']
+
+    def __str__(self):
+        return f"{self.label} ({self.slug})"

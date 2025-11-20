@@ -6,6 +6,11 @@ from django.contrib.auth import authenticate, login, logout, get_user_model
 from .serializers import UserSerializer
 from rest_framework.authtoken.models import Token
 from utils.email_service import notify_new_user_registration, notify_user_signup_confirmation
+from rest_framework import mixins
+from .serializers import NotificationSerializer
+from django.shortcuts import get_object_or_404
+from .models import Notification
+from django.db import models
 
 User = get_user_model()
 
@@ -127,3 +132,37 @@ class AuthViewSet(viewsets.ViewSet):
     def logout(self, request):
         logout(request)
         return Response({'detail': 'Successfully logged out'})
+
+
+class NotificationViewSet(mixins.ListModelMixin,
+                          mixins.DestroyModelMixin,
+                          viewsets.GenericViewSet):
+    """List and manage notifications belonging to the authenticated user.
+
+    - GET /notifications/ : list notifications for the current user (or email)
+    - POST /notifications/{id}/mark_read/ : mark a notification as read
+    - DELETE /notifications/{id}/ : delete a notification
+    - POST /notifications/clear_all/ : clear (delete) all notifications for user
+    """
+    serializer_class = NotificationSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        # Notifications linked to the user OR matching the user's email
+        qs = Notification.objects.filter(models.Q(user=user) | models.Q(email__iexact=user.email))
+        return qs
+
+    @action(detail=True, methods=['post'])
+    def mark_read(self, request, pk=None):
+        obj = get_object_or_404(self.get_queryset(), pk=pk)
+        obj.read = True
+        obj.save()
+        return Response({'detail': 'marked read'})
+
+    @action(detail=False, methods=['post'])
+    def clear_all(self, request):
+        user = request.user
+        Notification.objects.filter(models.Q(user=user) | models.Q(email__iexact=user.email)).delete()
+        return Response({'detail': 'cleared'})
