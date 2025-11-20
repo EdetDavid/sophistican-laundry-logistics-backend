@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import LaundryRequest, Driver
+from .models import PricingItem
 
 @admin.register(Driver)
 class DriverAdmin(admin.ModelAdmin):
@@ -31,3 +32,12 @@ class LaundryRequestAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
+
+
+@admin.register(PricingItem)
+class PricingItemAdmin(admin.ModelAdmin):
+    list_display = ('slug', 'label', 'price', 'ordering')
+    list_editable = ('price', 'ordering')
+    search_fields = ('slug', 'label')
+    ordering = ('ordering', 'slug')
+    list_per_page = 50
